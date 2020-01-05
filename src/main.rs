@@ -6,7 +6,10 @@ use web_view::*;
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
-    let mut url = "https://gopher.commons.host/".to_string();
+
+    let listener = TcpListener::bind("0.0.0.0:0")?;
+    let mut url = format!("http://{}", listener.local_addr()?);
+
     if args.len() > 1 {
         let mut target = args[1].to_string();
         if !target.starts_with("gopher://") {
@@ -14,9 +17,6 @@ fn main() -> Result<()> {
         }
         url.push_str(&target);
     }
-
-    let listener = TcpListener::bind("0.0.0.0:0")?;
-    let addr = format!("http://{}", listener.local_addr()?);
 
     thread::spawn(move || {
         if let Err(e) = server::start(listener) {
@@ -26,7 +26,7 @@ fn main() -> Result<()> {
 
     web_view::builder()
         .title("gogo")
-        .content(Content::Url(addr))
+        .content(Content::Url(url))
         .size(800, 600)
         .resizable(true)
         .debug(true)
