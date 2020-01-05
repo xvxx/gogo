@@ -81,7 +81,7 @@ fn print_help() {
 
 Options:
 
-    -s, --server    Just start as Gopher server, no UI.
+    -s, --server    Just start as HTTP server, no UI.
 
 Other flags:
 
