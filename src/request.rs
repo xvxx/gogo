@@ -18,6 +18,11 @@ impl Request {
     pub fn parse(&mut self, line: &str) {
         self.path = path_from_line(line);
     }
+
+    /// Return the URL for this request.
+    pub fn url(&self) -> String {
+        format!("{}/{}", self.addr, self.path)
+    }
 }
 
 /// Given an HTTP request line, returns just the path requested.
@@ -47,5 +52,24 @@ mod tests {
             "()#)%# #%) *# )#",
             path_from_line("GET /()#)%# #%) *# )# HTTP/1.1")
         );
+    }
+
+    #[test]
+    fn test_url() {
+        macro_rules! parse {
+            ($e:expr) => {{
+                let addr = "0.0.0.0:1234".parse().unwrap();
+                let mut req = Request::from(addr);
+                req.parse($e);
+                req
+            }};
+        }
+
+        let req = parse!("GET / HTTP/1.1");
+        assert_eq!("0.0.0.0:1234/", req.url());
+        let req = parse!("GET /phkt.io HTTP/1.1");
+        assert_eq!("0.0.0.0:1234/phkt.io", req.url());
+        let req = parse!("GET /phkt.io/1/phd HTTP/1.1");
+        assert_eq!("0.0.0.0:1234/phkt.io/1/phd", req.url());
     }
 }
