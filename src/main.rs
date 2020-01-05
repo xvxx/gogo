@@ -1,6 +1,6 @@
 #![windows_subsystem = "windows"]
 
-use gogo::{server, Result};
+use gogo::{server, Result, DEFAULT_GOPHERHOLE};
 use std::{net::TcpListener, thread};
 use web_view::*;
 
@@ -41,6 +41,8 @@ fn main() -> Result<()> {
             target = format!("gopher://{}", target);
         }
         url.push_str(&target);
+    } else {
+        url.push_str(DEFAULT_GOPHERHOLE)
     }
 
     thread::spawn(move || {
