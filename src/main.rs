@@ -18,6 +18,9 @@ fn main() -> Result<()> {
                 print_help();
                 return Ok(());
             }
+            "-s" | "--server" | "-server" => {
+                return run_server();
+            }
             arg => {
                 if !arg.is_empty() {
                     if let Some('-') = arg.chars().nth(0) {
@@ -56,6 +59,16 @@ fn main() -> Result<()> {
         .invoke_handler(|_webview, _arg| Ok(()))
         .run()
         .unwrap();
+
+    Ok(())
+}
+
+fn run_server() -> Result<()> {
+    let listener = TcpListener::bind("0.0.0.0:0")?;
+
+    if let Err(e) = server::start(listener) {
+        eprintln!("{}", e);
+    }
 
     Ok(())
 }
