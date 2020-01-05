@@ -9,7 +9,13 @@ to browse Gopher via https://github.com/Boscop/web-view.
 ## installation
 
 Standalone binaries are coming soon. For now you have to build from
-source. Assumng you have Rust/Cargo and Git installed:
+source. 
+
+On Linux, you must first install webkit2gtk:
+
+    sudo apt install webkit2gtk-4.0
+
+Then, assuming you have Rust/Cargo and Git installed:
 
     git clone https://github.com/dvkt/gogo
     cd gogo
