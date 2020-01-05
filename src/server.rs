@@ -1,6 +1,6 @@
 use crate::Result;
 use std::{
-    io::{self, prelude::*, BufReader, Read, Write},
+    io::{prelude::*, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
 };
 use threadpool::ThreadPool;
@@ -10,8 +10,7 @@ use threadpool::ThreadPool;
 const MAX_WORKERS: usize = 10;
 
 /// Starts a web server locally.
-pub fn start() -> Result<()> {
-    let listener = TcpListener::bind("0.0.0.0:0")?;
+pub fn start(listener: TcpListener) -> Result<()> {
     let pool = ThreadPool::new(MAX_WORKERS);
     let addr = listener.local_addr()?;
 
