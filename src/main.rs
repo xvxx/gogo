@@ -7,6 +7,28 @@ use web_view::*;
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
 
+    let mut iter = args.iter();
+    while let Some(arg) = iter.next() {
+        match arg.as_ref() {
+            "-v" | "--version" | "-version" => {
+                print_version();
+                return Ok(());
+            }
+            "-h" | "--help" | "-help" => {
+                print_help();
+                return Ok(());
+            }
+            arg => {
+                if !arg.is_empty() {
+                    if let Some('-') = arg.chars().nth(0) {
+                        eprintln!("Unknown option: {}", arg);
+                        std::process::exit(1);
+                    }
+                }
+            }
+        }
+    }
+
     let listener = TcpListener::bind("0.0.0.0:0")?;
     let mut url = format!("http://{}/", listener.local_addr()?);
 
@@ -36,4 +58,25 @@ fn main() -> Result<()> {
         .unwrap();
 
     Ok(())
+}
+
+fn print_help() {
+    println!(
+        "Usage:
+
+    gogo [options] <gopher-url>
+
+Options:
+
+    -s, --server    Just start as Gopher server, no UI.
+
+Other flags:
+
+    -h, --help      Print this screen.
+    -v, --version   Print gogo version."
+    );
+}
+
+fn print_version() {
+    println!("gogo v{}", env!("CARGO_PKG_VERSION"));
 }
