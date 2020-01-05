@@ -1,4 +1,4 @@
-use crate::Result;
+use crate::{request::Request, Result};
 use std::{
     io::{prelude::*, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
@@ -32,19 +32,22 @@ fn handle_request(mut stream: TcpStream) -> Result<()> {
     let mut buffer = [0; 512];
     stream.read(&mut buffer).unwrap();
     let reader = BufReader::new(buffer.as_ref());
-    println!("│ {}", reader.lines().nth(0).unwrap().unwrap());
-    write_response(&mut stream)?;
+    if let Some(Ok(line)) = reader.lines().nth(0) {
+        println!("│ {}", line);
+        let req = Request::from(&line);
+        write_response(&mut stream, req)?;
+    }
     Ok(())
 }
 
 /// Writes a response to a client based on a Request.
-fn write_response<'a, W>(mut w: &'a W) -> Result<()>
+fn write_response<'a, W>(mut w: &'a W, req: Request) -> Result<()>
 where
     &'a W: Write,
 {
     let contents = std::fs::read_to_string("./html/layout.html").unwrap();
     let contents = contents
-        .replace("{{content}}", "<h1>Hiya 🦀</h1>")
+        .replace("{{content}}", &format!("<h1>🦀 {}</h1>", req.path))
         .replace("{{title}}", "Hi from Rust");
     let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
 
