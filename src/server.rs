@@ -42,7 +42,7 @@ fn write_response<'a, W>(mut w: &'a W) -> Result<()>
 where
     &'a W: Write,
 {
-    let contents = std::fs::read_to_string("hello.html").unwrap();
+    let contents = std::fs::read_to_string("./html/index.html").unwrap();
     let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
 
     w.write(response.as_bytes()).unwrap();
