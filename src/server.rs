@@ -2,7 +2,7 @@ use crate::{request::Request, Result};
 use phetch::{gopher, menu::Menu};
 use std::{
     io::{prelude::*, BufReader, Read, Write},
-    net::{SocketAddr, TcpListener, TcpStream},
+    net::{TcpListener, TcpStream},
 };
 use threadpool::ThreadPool;
 
@@ -51,7 +51,7 @@ where
     let response = match gopher::fetch_url(&req.path) {
         Ok(content) => {
             let rendered = layout
-                .replace("{{content}}", &to_html(&req.addr, req.url(), content))
+                .replace("{{content}}", &to_html(req.url(), content))
                 .replace("{{title}}", "🦀");
             println!("│ {}", "200 OK");
             format!("HTTP/1.1 200 OK\r\n\r\n{}", rendered)
@@ -70,13 +70,13 @@ where
 }
 
 /// Converts a Gopher response into HTML (links, etc).
-fn to_html(gogo_url: &SocketAddr, url: String, gopher: String) -> String {
+fn to_html(url: String, gopher: String) -> String {
     let mut out = String::new();
     let menu = Menu::parse(url, gopher);
     for line in menu.lines {
         out.push_str(&format!("<div class='{:?}'>", line.typ));
         if line.typ != gopher::Type::Info {
-            out.push_str(format!("<a href='{}/{}'>", gogo_url, line.url).as_ref());
+            out.push_str(format!("<a href='/{}'>", line.url).as_ref());
         }
         if line.name.is_empty() {
             out.push_str("&nbsp;");
