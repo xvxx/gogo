@@ -1,13 +1,22 @@
+use std::net::SocketAddr;
+
 pub struct Request {
+    pub addr: SocketAddr,
     pub path: String,
 }
 
 impl Request {
-    /// Creates a new Request from a raw HTTP request.
-    pub fn from(line: &str) -> Request {
+    /// Creates a new Request from a socket address..
+    pub fn from(addr: SocketAddr) -> Request {
         Request {
-            path: path_from_line(line),
+            addr,
+            path: String::new(),
         }
+    }
+
+    /// Parse HTTP request line to fill out this Request.
+    pub fn parse(&mut self, line: &str) {
+        self.path = path_from_line(line);
     }
 }
 

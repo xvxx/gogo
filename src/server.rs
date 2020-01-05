@@ -1,4 +1,5 @@
 use crate::{request::Request, Result};
+use phetch::gopher;
 use std::{
     io::{prelude::*, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
@@ -16,10 +17,11 @@ pub fn start(listener: TcpListener) -> Result<()> {
 
     println!("┌ Listening at {}", addr);
     for stream in listener.incoming() {
+        let req = Request::from(addr.clone());
         let stream = stream?;
         println!("┌ Connection from {}", stream.peer_addr()?);
         pool.execute(move || {
-            if let Err(e) = handle_request(stream) {
+            if let Err(e) = handle_request(stream, req) {
                 eprintln!("└ {}", e);
             }
         });
@@ -28,13 +30,13 @@ pub fn start(listener: TcpListener) -> Result<()> {
 }
 
 /// Reads from the client and responds.
-fn handle_request(mut stream: TcpStream) -> Result<()> {
+fn handle_request(mut stream: TcpStream, mut req: Request) -> Result<()> {
     let mut buffer = [0; 512];
     stream.read(&mut buffer).unwrap();
     let reader = BufReader::new(buffer.as_ref());
     if let Some(Ok(line)) = reader.lines().nth(0) {
         println!("│ {}", line);
-        let req = Request::from(&line);
+        req.parse(&line);
         write_response(&mut stream, req)?;
     }
     Ok(())
@@ -45,11 +47,22 @@ fn write_response<'a, W>(mut w: &'a W, req: Request) -> Result<()>
 where
     &'a W: Write,
 {
-    let contents = std::fs::read_to_string("./html/layout.html").unwrap();
-    let contents = contents
-        .replace("{{content}}", &format!("<h1>🦀 {}</h1>", req.path))
-        .replace("{{title}}", "Hi from Rust");
-    let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
+    let layout = std::fs::read_to_string("./html/layout.html")?;
+    let response = match gopher::fetch_url(&req.path) {
+        Ok(content) => {
+            let rendered = layout
+                .replace("{{content}}", &content)
+                .replace("{{title}}", "🦀");
+            println!("│ {}", "200 OK");
+            format!("HTTP/1.1 200 OK\r\n\r\n{}", rendered)
+        }
+        Err(e) => {
+            println!("│ path: {}", req.path);
+            println!("├ {}: {}", "500 Internal Server Error", req.path);
+            println!("└ {}", e);
+            format!("HTTP/1.1 500 Internal Server Error\r\n\r\n{}", e)
+        }
+    };
 
     w.write(response.as_bytes()).unwrap();
     w.flush().unwrap();

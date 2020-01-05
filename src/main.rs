@@ -8,7 +8,7 @@ fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
 
     let listener = TcpListener::bind("0.0.0.0:0")?;
-    let mut url = format!("http://{}", listener.local_addr()?);
+    let mut url = format!("http://{}/", listener.local_addr()?);
 
     if args.len() > 1 {
         let mut target = args[1].to_string();
