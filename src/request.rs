@@ -14,6 +14,19 @@ impl Request {
         }
     }
 
+    /// Returns path to static file on disk asked for by this request.
+    /// Ex: css files.
+    pub fn disk_path(&self) -> String {
+        let mut s = String::from("./static/");
+        s.push_str(&self.path);
+        s
+    }
+
+    /// Is this request asking for a static file on disk?
+    pub fn is_static_file(&self) -> bool {
+        std::path::Path::new(&self.disk_path()).is_file()
+    }
+
     /// Parse HTTP request line to fill out this Request.
     pub fn parse(&mut self, line: &str) {
         self.path = path_from_line(line);

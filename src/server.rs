@@ -1,7 +1,8 @@
 use crate::{request::Request, Result};
 use phetch::{gopher, menu::Menu};
 use std::{
-    io::{prelude::*, BufReader, Read, Write},
+    fs,
+    io::{self, prelude::*, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
 };
 use threadpool::ThreadPool;
@@ -37,8 +38,25 @@ fn handle_request(mut stream: TcpStream, mut req: Request) -> Result<()> {
     if let Some(Ok(line)) = reader.lines().nth(0) {
         println!("│ {}", line);
         req.parse(&line);
-        write_response(&mut stream, req)?;
+        if req.is_static_file() {
+            write_file(&mut stream, req)?;
+        } else {
+            write_response(&mut stream, req)?;
+        }
     }
+    Ok(())
+}
+
+/// Send a static file to the client.
+fn write_file<'a, W>(mut w: &'a W, req: Request) -> Result<()>
+where
+    &'a W: Write,
+{
+    let path = req.disk_path();
+    let mut f = fs::File::open(&path)?;
+    println!("│ 200 OK: {}", path);
+    w.write(b"HTTP/1.1 200 OK\r\n\r\n")?;
+    io::copy(&mut f, &mut w)?;
     Ok(())
 }
 
@@ -47,7 +65,7 @@ fn write_response<'a, W>(mut w: &'a W, req: Request) -> Result<()>
 where
     &'a W: Write,
 {
-    let layout = std::fs::read_to_string("./html/layout.html")?;
+    let layout = std::fs::read_to_string("./static/layout.html")?;
     let response = match gopher::fetch_url(&req.path) {
         Ok(content) => {
             let rendered = layout
