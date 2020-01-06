@@ -7,7 +7,6 @@ body {
 
 a, a:visited {
     text-decoration: none;
-    color: #198fff;
 }
 
 .wrapper {
@@ -20,7 +19,17 @@ a, a:visited {
     text-align: left;
 }
 
-.content .line {}
+.content .Menu a, nav a {
+    color: #198fff;
+}
+
+.content .Text a {
+    color: white;
+}
+
+.content .HTML a {
+    color: #19cb00;
+}
 
 .content .text {
     color: white;
