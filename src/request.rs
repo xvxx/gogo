@@ -27,6 +27,11 @@ impl Request {
         std::path::Path::new(&self.disk_path()).is_file()
     }
 
+    /// Path without the gopher://
+    pub fn short_path(&self) -> String {
+        self.path.replace("gopher://", "")
+    }
+
     /// Parse HTTP request line to fill out this Request.
     pub fn parse(&mut self, line: &str) {
         self.path = path_from_line(line);
