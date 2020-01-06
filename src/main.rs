@@ -1,8 +1,10 @@
 #![windows_subsystem = "windows"]
 
-use gogo::{server, Result};
+use phroxy::server;
 use std::{net::TcpListener, thread};
 use web_view::*;
+
+pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
