@@ -1,4 +1,5 @@
 use crate::{request::Request, Result, DEFAULT_GOPHERHOLE};
+use htmlescape;
 use phetch::{gopher, menu::Menu};
 use std::{
     fs,
@@ -73,7 +74,7 @@ where
     let response = match gopher::fetch_url(&req.path) {
         Ok(content) => {
             let rendered = layout
-                .replace("{{content}}", &to_html(req.url(), content))
+                .replace("{{content}}", &to_html(req.path.clone(), content))
                 .replace("{{url}}", &req.short_path())
                 .replace("{{title}}", "🦀");
             println!("│ {}", "200 OK");
@@ -92,8 +93,19 @@ where
     Ok(())
 }
 
-/// Converts a Gopher response into HTML (links, etc).
+/// Convert a Gopher response into HTML (links, etc).
 fn to_html(url: String, gopher: String) -> String {
+    println!("PARSING: {}", url);
+    if let (gopher::Type::Text, _, _, _) = gopher::parse_url(&url) {
+        to_text_html(url, gopher)
+    } else {
+        to_menu_html(url, gopher)
+    }
+}
+
+/// Convert a Gopher response into an HTML Gopher menu, with links and
+/// inline search fields.
+fn to_menu_html(url: String, gopher: String) -> String {
     let mut out = String::new();
     let menu = Menu::parse(url, gopher);
     for line in menu.lines {
@@ -112,4 +124,12 @@ fn to_html(url: String, gopher: String) -> String {
         out.push_str("</div>");
     }
     out
+}
+
+/// Convert a Gopher text file into HTML representing it.
+fn to_text_html(_url: String, gopher: String) -> String {
+    format!(
+        "<div class='text'>{}</div>",
+        htmlescape::encode_minimal(&gopher)
+    )
 }

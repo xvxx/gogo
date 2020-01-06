@@ -17,10 +17,13 @@ a, a:visited {
 .content {
     margin: 0 auto;
     display: inline-block;
+    text-align: left;
 }
 
-.content .line {
-    text-align: left;
+.content .line {}
+
+.content .text {
+    color: white;
 }
 
 nav {

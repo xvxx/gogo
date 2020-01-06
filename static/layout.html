@@ -26,7 +26,7 @@
 <script>
   document.getElementById("goto").addEventListener("submit", function (e) {
     e.preventDefault();
-    window.location = document.getElementById("goto-url").value;
+    window.location = "/" + document.getElementById("goto-url").value;
     return false;
   });
 </script>
