@@ -30,11 +30,9 @@ Then, assuming you have Rust/Cargo and Git installed:
 
 ## todo
 
-- [ ] back/forward
 - [ ] new window
 - [ ] ...tabs?
 - [ ] bookmarks
 - [ ] history
 - [ ] share history and bookmarks format with phetch
-- [ ] use local server instead of gopher.commons.host
 
