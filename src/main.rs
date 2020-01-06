@@ -6,7 +6,9 @@ use web_view::*;
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
+    let mut port = 0;
 
+    let mut server_only = false;
     let mut iter = args.iter();
     while let Some(arg) = iter.next() {
         match arg.as_ref() {
@@ -18,8 +20,13 @@ fn main() -> Result<()> {
                 print_help();
                 return Ok(());
             }
+            "-p" | "--port" | "-port" => {
+                if let Some(p) = iter.next() {
+                    port = p.parse().unwrap_or(0);
+                }
+            }
             "-s" | "--server" | "-server" => {
-                return run_server();
+                server_only = true;
             }
             arg => {
                 if !arg.is_empty() {
@@ -31,14 +38,16 @@ fn main() -> Result<()> {
             }
         }
     }
+    if server_only {
+        return run_server(port);
+    }
 
     let listener = TcpListener::bind("0.0.0.0:0")?;
     let mut url = format!("http://{}/", listener.local_addr()?);
 
-    if args.len() > 1 {
-        let mut target = args[1].to_string();
+    if let Some(target) = iter.next() {
         if !target.starts_with("gopher://") {
-            target = format!("gopher://{}", target);
+            url.push_str("gopher://");
         }
         url.push_str(&target);
     }
@@ -63,8 +72,8 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn run_server() -> Result<()> {
-    let listener = TcpListener::bind("0.0.0.0:0")?;
+fn run_server(port: usize) -> Result<()> {
+    let listener = TcpListener::bind(format!("0.0.0.0:{}", port))?;
 
     if let Err(e) = server::start(listener) {
         eprintln!("{}", e);
@@ -81,12 +90,13 @@ fn print_help() {
 
 Options:
 
-    -s, --server    Just start as HTTP server, no UI.
+    -s, --server      Just start as HTTP server, no UI.
+    -p, --port [NUM]  Set the server's port. Only works with -s.
 
 Other flags:
 
-    -h, --help      Print this screen.
-    -v, --version   Print gogo version."
+    -h, --help        Print this screen.
+    -v, --version     Print gogo version."
     );
 }
 
