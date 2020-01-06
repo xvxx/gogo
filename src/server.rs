@@ -74,6 +74,7 @@ where
         Ok(content) => {
             let rendered = layout
                 .replace("{{content}}", &to_html(req.url(), content))
+                .replace("{{url}}", &req.short_path())
                 .replace("{{title}}", "🦀");
             println!("│ {}", "200 OK");
             format!("HTTP/1.1 200 OK\r\n\r\n{}", rendered)
