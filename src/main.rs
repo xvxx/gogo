@@ -7,6 +7,7 @@ use web_view::*;
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     let mut port = 0;
+    let mut url_arg = "";
 
     let mut server_only = false;
     let mut iter = args.iter();
@@ -33,6 +34,8 @@ fn main() -> Result<()> {
                     if let Some('-') = arg.chars().nth(0) {
                         eprintln!("Unknown option: {}", arg);
                         std::process::exit(1);
+                    } else {
+                        url_arg = arg;
                     }
                 }
             }
@@ -44,13 +47,10 @@ fn main() -> Result<()> {
 
     let listener = TcpListener::bind("0.0.0.0:0")?;
     let mut url = format!("http://{}/", listener.local_addr()?);
-
-    if let Some(target) = iter.next() {
-        if !target.starts_with("gopher://") {
-            url.push_str("gopher://");
-        }
-        url.push_str(&target);
+    if !url_arg.starts_with("gopher://") {
+        url.push_str("gopher://");
     }
+    url.push_str(&url_arg);
 
     thread::spawn(move || {
         if let Err(e) = server::start(listener) {
