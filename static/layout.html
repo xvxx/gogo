@@ -12,11 +12,23 @@
     <nav>
       [ <a href="javascript:history.back();">back</a>
       |
+      <form id="goto" method="get">
+        <input id="goto-url" type="text" value="{{url}}" />
+      </form>
+      |
       <a href="javascript:history.forward();">next</a>
       ]
     </nav>
     <pre class="content">{{content}}</pre>
   </div>
 </body>
+
+<script>
+  document.getElementById("goto").addEventListener("submit", function (e) {
+    e.preventDefault();
+    window.location = document.getElementById("goto-url").value;
+    return false;
+  });
+</script>
 
 </html>

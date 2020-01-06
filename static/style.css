@@ -2,6 +2,7 @@ body {
     font-size: 150%;
     background-color: black;
     color: yellow;
+    font-family: monospace;
 }
 
 a, a:visited {
@@ -20,4 +21,22 @@ a, a:visited {
 
 .content .line {
     text-align: left;
+}
+
+nav {
+    margin-bottom: 15px;
+}
+
+form {
+    display: inline;
+}
+
+input[type=text] {
+    text-align: center;
+    border: none;
+    background: black;
+    color: yellow;
+    font-family: monospace;
+    font-size: 125%;
+    padding: 5px;
 }
