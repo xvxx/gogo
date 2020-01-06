@@ -116,7 +116,7 @@ fn to_menu_html(url: String, gopher: String) -> String {
         if line.name.is_empty() {
             out.push_str("&nbsp;");
         } else {
-            out.push_str(&line.name);
+            out.push_str(&htmlescape::encode_minimal(&line.name));
         }
         if line.typ != gopher::Type::Info {
             out.push_str("</a>");
