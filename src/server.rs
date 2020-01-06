@@ -58,7 +58,7 @@ where
 {
     let path = req.disk_path();
     let mut f = fs::File::open(&path)?;
-    println!("│ 200 OK: {}", path);
+    println!("└ 200 OK: {}", path);
     w.write(b"HTTP/1.1 200 OK\r\n\r\n")?;
     io::copy(&mut f, &mut w)?;
     Ok(())
