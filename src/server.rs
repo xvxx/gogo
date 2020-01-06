@@ -1,6 +1,9 @@
 use crate::{request::Request, Result, DEFAULT_GOPHERHOLE};
 use htmlescape;
-use phetch::{gopher, menu::Menu};
+use phetch::{
+    gopher,
+    menu::{Line, Menu},
+};
 use std::{
     fs,
     io::{self, prelude::*, BufReader, Read, Write},
@@ -82,9 +85,9 @@ where
         }
         Err(e) => {
             println!("│ path: {}", req.path);
-            println!("├ {}: {}", "500 Internal Server Error", req.path);
+            println!("├ {}: {}", "404 Not Found", req.path);
             println!("└ {}", e);
-            format!("HTTP/1.1 500 Internal Server Error\r\n\r\n{}", e)
+            format!("HTTP/1.1 404 Not Found\r\n\r\n{}", e)
         }
     };
 
@@ -95,7 +98,6 @@ where
 
 /// Convert a Gopher response into HTML (links, etc).
 fn to_html(url: String, gopher: String) -> String {
-    println!("PARSING: {}", url);
     if let (gopher::Type::Text, _, _, _) = gopher::parse_url(&url) {
         to_text_html(url, gopher)
     } else {
@@ -110,15 +112,17 @@ fn to_menu_html(url: String, gopher: String) -> String {
     let menu = Menu::parse(url, gopher);
     for line in menu.lines {
         out.push_str(&format!("<div class='line {:?}'>", line.typ));
-        if line.typ != gopher::Type::Info {
+        if line.typ != gopher::Type::Info && line.typ != gopher::Type::Search {
             out.push_str(format!("<a href='/{}'>", line.url).as_ref());
         }
         if line.name.is_empty() {
             out.push_str("&nbsp;");
+        } else if line.typ == gopher::Type::Search {
+            out.push_str(&to_search_html(&line));
         } else {
             out.push_str(&htmlescape::encode_minimal(&line.name));
         }
-        if line.typ != gopher::Type::Info {
+        if line.typ != gopher::Type::Info && line.typ != gopher::Type::Search {
             out.push_str("</a>");
         }
         out.push_str("</div>");
@@ -131,5 +135,13 @@ fn to_text_html(_url: String, gopher: String) -> String {
     format!(
         "<div class='text'>{}</div>",
         htmlescape::encode_minimal(&gopher)
+    )
+}
+
+/// HTML for a Gopher Search item.
+fn to_search_html(line: &Line) -> String {
+    format!(
+        "<form class='search' action='{}'><input width='100%' type='text' placeholder='{}'></form>",
+        line.url, line.name
     )
 }

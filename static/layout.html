@@ -24,10 +24,21 @@
 </body>
 
 <script>
+  // big search bar at the top of the page
   document.getElementById("goto").addEventListener("submit", function (e) {
-    e.preventDefault();
     window.location = "/" + document.getElementById("goto-url").value;
+    e.preventDefault();
     return false;
+  });
+
+  // inline search entries
+  Array.prototype.filter.call(document.getElementsByClassName("search"), function (el) {
+    el.addEventListener("submit", function (e) {
+      const input = this.getElementsByTagName("input")[0];
+      window.location = "/" + this.action + "?" + input.value;
+      e.preventDefault();
+      return false;
+    });
   });
 </script>
 

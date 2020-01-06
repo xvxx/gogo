@@ -43,7 +43,7 @@ form {
     display: inline;
 }
 
-input[type=text] {
+nav input[type=text] {
     text-align: center;
     border: none;
     background: black;
@@ -51,4 +51,19 @@ input[type=text] {
     font-family: monospace;
     font-size: 125%;
     padding: 5px;
+}
+
+.content .Search input[type=text] {
+    text-align: left;
+    border: none;
+    background: black;
+    color: white;
+    font-family: monospace;
+    font-size: 100%;
+    padding: 5px;
+    width: 100%;
+}
+
+.content .Search input[type=text]::placeholder {
+    color: white;
 }
