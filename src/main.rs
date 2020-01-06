@@ -61,7 +61,7 @@ fn main() -> Result<()> {
     web_view::builder()
         .title("gogo")
         .content(Content::Url(url))
-        .size(800, 600)
+        .size(1024, 768)
         .resizable(true)
         .debug(true)
         .user_data(())
