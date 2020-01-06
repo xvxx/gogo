@@ -1,4 +1,4 @@
-use crate::{request::Request, Result};
+use crate::{request::Request, Result, DEFAULT_GOPHERHOLE};
 use phetch::{gopher, menu::Menu};
 use std::{
     fs,
@@ -38,6 +38,10 @@ fn handle_request(mut stream: TcpStream, mut req: Request) -> Result<()> {
     if let Some(Ok(line)) = reader.lines().nth(0) {
         println!("│ {}", line);
         req.parse(&line);
+        if req.path.is_empty() {
+            req.path = DEFAULT_GOPHERHOLE.into();
+        }
+
         if req.is_static_file() {
             write_file(&mut stream, req)?;
         } else {
