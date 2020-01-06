@@ -92,7 +92,7 @@ fn to_html(url: String, gopher: String) -> String {
     let mut out = String::new();
     let menu = Menu::parse(url, gopher);
     for line in menu.lines {
-        out.push_str(&format!("<div class='{:?}'>", line.typ));
+        out.push_str(&format!("<div class='line {:?}'>", line.typ));
         if line.typ != gopher::Type::Info {
             out.push_str(format!("<a href='/{}'>", line.url).as_ref());
         }

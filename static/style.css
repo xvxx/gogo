@@ -1,4 +1,23 @@
 body {
+    font-size: 150%;
     background-color: black;
-    color: white;
+    color: yellow;
+}
+
+a, a:visited {
+    text-decoration: none;
+    color: #198fff;
+}
+
+.wrapper {
+    text-align: center;
+}
+
+.content {
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.content .line {
+    text-align: left;
 }
