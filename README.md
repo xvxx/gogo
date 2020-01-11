@@ -17,7 +17,7 @@ On Linux, you must first install webkit2gtk:
 
 Then, assuming you have Rust/Cargo and Git installed:
 
-    git clone https://github.com/dvkt/gogo
+    git clone https://github.com/xvxx/gogo
     cd gogo
     cargo install --path .
     gogo <gopher-url>
