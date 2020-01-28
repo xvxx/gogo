@@ -1,10 +1,11 @@
 # 🌎 gogo 
 
-WebKit-based Gopher browser. Inspired by
-https://github.com/Lartu/OpenNapkin.
+WebKit-based Gopher desktop client. 
 
-Uses https://gopher.commons.host/ and your operating system's WebView
-to browse Gopher via https://github.com/Boscop/web-view.
+Inspired by https://github.com/Lartu/OpenNapkin and
+https://gopher.commons.host, gogo uses [phroxy][phroxy] and your
+operating system's native [WebView][webview] to browse the world of
+Gopher in style.
 
 ## installation
 
@@ -30,9 +31,12 @@ Then, assuming you have Rust/Cargo and Git installed:
 
 ## todo
 
+- [ ] keyboard shortcuts
 - [ ] new window
 - [ ] ...tabs?
 - [ ] bookmarks
 - [ ] history
 - [ ] share history and bookmarks format with phetch
 
+[phroxy]: https://github.com/xvxx/phroxy
+https://github.com/boscop/web-view
