@@ -6,7 +6,5 @@ edition = "2018"
 
 [dependencies]
 web-view = "0.5.4"
-threadpool = "1.7.1"
-phetch = "0.1.10"
 phroxy = "0.1.0"
 htmlescape = "0.3.1"
