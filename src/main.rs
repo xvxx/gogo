@@ -1,8 +1,12 @@
 #![windows_subsystem = "windows"]
 
-use phroxy::server;
-use std::{net::TcpListener, thread};
-use web_view::*;
+use {
+    phroxy,
+    std::{net::TcpListener, thread},
+    web_view::*,
+};
+
+static DEFAULT_GOPHERHOLE: &str = "gopher://phroxy.net";
 
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
@@ -10,8 +14,8 @@ fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     let mut port = 0;
     let mut url_arg = "";
-
     let mut server_only = false;
+
     let mut iter = args.iter();
     while let Some(arg) = iter.next() {
         match arg.as_ref() {
@@ -41,26 +45,29 @@ fn main() -> Result<()> {
             }
         }
     }
-    if server_only {
-        return run_server(port);
+
+    if port > 0 && !server_only {
+        return Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "--port can only be used with --server",
+        )));
     }
 
-    let listener = TcpListener::bind("0.0.0.0:0")?;
+    let port = if server_only { port } else { 0 };
+    let listener = TcpListener::bind(format!("0.0.0.0:{}", port))?;
     let mut url = format!("http://{}/", listener.local_addr()?);
-    if url_arg.is_empty() {
-        url.push_str("gopher://phroxy.net");
-    } else {
+    if !url_arg.is_empty() {
         if !url_arg.starts_with("gopher://") {
             url.push_str("gopher://");
         }
         url.push_str(&url_arg);
     }
 
-    thread::spawn(move || {
-        if let Err(e) = server::start(listener) {
-            eprintln!("{}", e);
-        }
-    });
+    if server_only {
+        run_server(listener)?;
+    } else {
+        thread::spawn(move || run_server(listener));
+    }
 
     web_view::builder()
         .title("gogo")
@@ -76,13 +83,10 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn run_server(port: usize) -> Result<()> {
-    let listener = TcpListener::bind(format!("0.0.0.0:{}", port))?;
-
-    if let Err(e) = server::start(listener) {
+fn run_server(listener: TcpListener) -> Result<()> {
+    if let Err(e) = phroxy::server::start(listener, DEFAULT_GOPHERHOLE) {
         eprintln!("{}", e);
     }
-
     Ok(())
 }
 
