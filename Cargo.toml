@@ -6,5 +6,5 @@ edition = "2018"
 
 [dependencies]
 web-view = "0.5.4"
-phroxy = "0.1.0"
+phroxy = "0.1.5"
 htmlescape = "0.3.1"
