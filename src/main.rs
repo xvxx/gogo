@@ -7,7 +7,7 @@ use web_view::*;
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 fn main() -> Result<()> {
-    let args: Vec<String> = std::env::args().collect();
+    let args: Vec<_> = std::env::args().skip(1).collect();
     let mut port = 0;
     let mut url_arg = "";
 
@@ -32,13 +32,11 @@ fn main() -> Result<()> {
                 server_only = true;
             }
             arg => {
-                if !arg.is_empty() {
-                    if let Some('-') = arg.chars().nth(0) {
-                        eprintln!("Unknown option: {}", arg);
-                        std::process::exit(1);
-                    } else {
-                        url_arg = arg;
-                    }
+                if let Some('-') = arg.chars().nth(0) {
+                    eprintln!("Unknown option: {}", arg);
+                    std::process::exit(1);
+                } else {
+                    url_arg = arg;
                 }
             }
         }
@@ -49,10 +47,14 @@ fn main() -> Result<()> {
 
     let listener = TcpListener::bind("0.0.0.0:0")?;
     let mut url = format!("http://{}/", listener.local_addr()?);
-    if !url_arg.starts_with("gopher://") {
-        url.push_str("gopher://");
+    if url_arg.is_empty() {
+        url.push_str("gopher://phroxy.net");
+    } else {
+        if !url_arg.starts_with("gopher://") {
+            url.push_str("gopher://");
+        }
+        url.push_str(&url_arg);
     }
-    url.push_str(&url_arg);
 
     thread::spawn(move || {
         if let Err(e) = server::start(listener) {
